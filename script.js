@@ -5,17 +5,32 @@ let score = 0;
 const _API_URL =
   "https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple";
 
-const checkAnswer = (element) => {
-  if (element.target.classList.contains("correct")) {
-    // sum score, change style and return
-    console.log("correct");
-  } else {
-    // change style incorrect answer
-    console.log("incorrect");
-  }
+const toggleButtons = (buttons) => {
+  buttons.forEach((button) => {
+    const isClicked = button.classList.contains("clicked");
+    button.disabled = !isClicked;
+    button.classList.toggle("clicked");
+  });
+};
 
-  // display next button
-  document.getElementById("next-button").className = "";
+const toggleNextButton = () =>
+  (document.getElementById("next-button").classList.toggle("hidden"));
+
+const sumScore = () => {
+  score += 10;
+  const scoreElement = document.getElementById("score");
+  scoreElement.innerText = score;
+};
+
+const checkAnswer = (element) => {
+  const buttons = document.querySelectorAll(".alternative");
+  if (element.target.classList.contains("correct")) {
+    sumScore();
+    toggleButtons(buttons);
+  } else {
+    toggleButtons(buttons);
+  }
+  toggleNextButton();
 };
 
 const displayScore = () => {
@@ -43,7 +58,6 @@ const displayQuestion = () => {
 const createQuestion = (question) => {
   const options = [];
   const questionContainer = document.createElement("div");
-  //questionContainer.classList.add("questions-container");
 
   // question
   const questionTitle = document.createElement("h1");
@@ -62,7 +76,6 @@ const createQuestion = (question) => {
     const incorrectAnswer = document.createElement("button");
     incorrectAnswer.className = "alternative";
     incorrectAnswer.addEventListener("click", checkAnswer);
-    //incorrectAnswer.classList.add("alternative");
     incorrectAnswer.innerText = answer;
     options.push(incorrectAnswer);
   });
@@ -90,7 +103,7 @@ const fetchQuestions = async () => {
 const nextQuestion = () => {
   currentQuestionIndex++;
   displayQuestion();
-  document.getElementById("next-button").className = "hidden";
+  toggleNextButton();
 };
 
 const startGame = async () => {
